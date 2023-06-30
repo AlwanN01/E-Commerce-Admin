@@ -2,6 +2,7 @@ import { type FC } from 'react'
 import { redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs'
 import { prisma } from '@/lib/prismadb'
+import Navbar from '@/components/navbar'
 
 interface Props {
   children: React.ReactNode
@@ -17,7 +18,7 @@ const DashboardLayout: FC<Props> = async ({ children, params }) => {
   if (!store) redirect('/')
   return (
     <div>
-      <nav>This is Nav</nav>
+      <Navbar />
       {children}
     </div>
   )

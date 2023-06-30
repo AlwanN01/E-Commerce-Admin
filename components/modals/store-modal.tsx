@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'react-hot-toast'
-import { NextResponse } from 'next/server'
+
 const formSchema = z.object({
   name: z.string().min(1)
 })

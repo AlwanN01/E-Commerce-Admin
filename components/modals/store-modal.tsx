@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'react-hot-toast'
-
+import { NextResponse } from 'next/server'
 const formSchema = z.object({
   name: z.string().min(1)
 })
@@ -28,7 +28,7 @@ const StoreModal: FC<Props> = ({}) => {
     try {
       setIsLoading(true)
       const res = await axios.post('/api/stores', values)
-      toast.success('Store Created')
+      window.location.assign(`/${res.data.id}`)
     } catch (error) {
       toast.error('Something went wrong')
     } finally {

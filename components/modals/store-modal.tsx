@@ -1,6 +1,6 @@
 'use client'
 import { type FC } from 'react'
-import Modal from '../ui/modal'
+import { Modal } from '@/components/ui/modal'
 import { useStoreModal } from '@/hooks/useStoreModal'
 
 interface Props {}

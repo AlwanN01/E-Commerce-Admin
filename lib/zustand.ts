@@ -5,9 +5,9 @@ import { immer } from 'zustand/middleware/immer'
 import { produce, type Immutable, type Draft } from 'immer'
 
 export type SetState<State> = (
-  nextStateOrUpdater: State | Partial<State> | ((state: Draft<State>) => void)
-  // shouldReplace?: boolean | undefined,
-  // action?: string | { type: unknown } | undefined
+  nextStateOrUpdater: State | Partial<State> | ((state: Draft<State>) => void),
+  shouldReplace?: boolean | undefined,
+  action?: string | { type: unknown } | undefined
 ) => void
 export type HandlerStore<State, Method> = (set: SetState<State>, get: () => State) => Method
 export type ReducerStore<State, Action> = (
@@ -24,8 +24,8 @@ type Options = {
 
 export function createStore<
   State extends object,
-  Method extends TypeSetState<State> | object,
-  Action extends { type: String | keyof TypeSetState<State>; payload?: unknown; [key: string]: unknown }
+  Method extends Record<string, (...props: any) => any>,
+  Action extends { type: String | keyof DefaultSetState<State>; payload?: unknown; [key: string]: unknown }
 >(
   initState: State,
   handler?: HandlerStore<State, Method> | null,
@@ -38,7 +38,8 @@ export function createStore<
     isLogging = false,
     devtools: _devtools = true
   } = (isOptions(reducerOrOptions) && reducerOrOptions) || options
-  const immerReducer = (reducerOrOptions && !isOptions(reducerOrOptions) && produce(reducerOrOptions)) || (async () => ({}))
+  const immerReducer =
+    (reducerOrOptions && !isOptions(reducerOrOptions) && produce(reducerOrOptions)) || (async () => ({}))
   return createSelectors(
     create(
       subscribeWithSelector(
@@ -48,7 +49,7 @@ export function createStore<
               const setWithLogging = (nextStateOrUpdater: Parameters<typeof set>[0]) => {
                 const key = Object.keys(nextStateOrUpdater)
                 const values = Object.values(nextStateOrUpdater)
-                return set(nextStateOrUpdater, false, {
+                set(nextStateOrUpdater, false, {
                   type:
                     key.length == 1
                       ? `set${key[0].charAt(0).toUpperCase() + key[0].slice(1)} to ${values[0]}`
@@ -59,7 +60,7 @@ export function createStore<
               }
               return {
                 dispatch: async (action: Action) => {
-                  isLogging && console.log('old State', get())
+                  isLogging && console.log('prev State', get())
                   set(
                     reducerOrOptions
                       ? await immerReducer!(get() as unknown as Immutable<State>, action, set, get)
@@ -79,7 +80,9 @@ export function createStore<
           {
             name:
               nameStore === 'Store'
-                ? `Store: ${Object.keys(initState).slice(0, 3).join(' | ')} ${Object.keys(initState).length > 3 ? '| ...' : ''}`
+                ? `Store: ${Object.keys(initState).slice(0, 3).join(' | ')} ${
+                    Object.keys(initState).length > 3 ? '| ...' : ''
+                  }`
                 : nameStore,
             enabled: _devtools && (process.env.NODE_ENV == 'production' ? false : undefined),
             maxAge: 10,
@@ -126,13 +129,10 @@ function createSelectors<S extends UseBoundStore<StoreApi<object>>>(_store: S) {
   return store
 }
 
-type TypeSetState<T> = {
-  [K in keyof T as `set${Capitalize<string & K>}`]: (state: T[K]) => void
-}
-type TypeDefaultSetState<T, M> = {
-  [K in keyof T as `set${Capitalize<string & K>}`]: `set${Capitalize<string & K>}` extends M
-    ? unknown
-    : (state: T[K] | ((prevState: T[K]) => T[K] | Promise<T[K]>)) => void | Promise<void>
+type DefaultSetState<T> = {
+  [K in keyof T as `set${Capitalize<string & K>}`]: (
+    state: T[K] | ((prevState: T[K]) => T[K] | Promise<T[K]>)
+  ) => void | Promise<void>
 }
 
 function defaultSetState<T extends object, M>(initstate: T, set: any, get: any) {
@@ -143,12 +143,12 @@ function defaultSetState<T extends object, M>(initstate: T, set: any, get: any) 
       $defaultSetState[`set${keyName}`] = async (valueOrCallback: any) => {
         const value = typeof valueOrCallback == 'function' ? await valueOrCallback(get()[key]) : valueOrCallback
         set({ [key]: value }, false, {
-          type: `set${keyName} to ${value}`
+          type: `set${keyName} to ${JSON.stringify(value)}`
         })
       }
     }
   }
-  return $defaultSetState as TypeDefaultSetState<T, M>
+  return $defaultSetState as DefaultSetState<T>
 }
 
 function extractString(str: string) {

@@ -5,12 +5,16 @@ import { Trash } from 'lucide-react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-
+import { toast } from 'react-hot-toast'
+import axios from 'axios'
+import { useParams, useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
 import { Heading } from '@/components/ui/heading'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import AlertModal from '@/components/modals/alert-modal'
+import { useStoreModal } from '@/hooks/useStoreModal'
 
 const formSchema = z.object({ name: z.string().nonempty() })
 type Settings = z.infer<typeof formSchema>
@@ -18,19 +22,47 @@ type Settings = z.infer<typeof formSchema>
 type Props = { initData: Store }
 
 const SettingsForm: FC<Props> = ({ initData }) => {
+  const params = useParams() as { storeId: string }
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const { setHasStore } = useStoreModal.use('setHasStore')
   const form = useForm<Settings>({
     resolver: zodResolver(formSchema),
     defaultValues: initData
   })
   const onSubmit = async (data: Settings) => {
-    console.log(data)
+    try {
+      setLoading(true)
+      await axios.patch(`/api/stores/${params.storeId}`, data)
+      router.refresh()
+      toast.success('Store Updated.')
+    } catch (error) {
+      toast.error('Something went wrong')
+    } finally {
+      setLoading(false)
+    }
+  }
+  const onDelete = async () => {
+    try {
+      setLoading(true)
+      await axios.delete(`/api/stores/${params.storeId}`)
+      setHasStore(false)
+      router.refresh()
+      router.push('/')
+    } catch (error) {
+      toast.error('Make sure you removed all products and categgories first')
+      toast.success('Store deleted. ')
+    } finally {
+      setLoading(false)
+      setOpen(false)
+    }
   }
   return (
     <>
+      <AlertModal isOpen={open} onClose={() => setOpen(false)} onConfirm={onDelete} loading={loading} />
       <div className='flex items-center justify-between'>
-        <Heading title='Settings' description='Manage store preference' />
+        <Heading title={`Settings (${initData.name})`} description='Manage store preference' />
         <Button variant='destructive' size='sm' onClick={() => setOpen(true)} disabled={loading}>
           <Trash className='h-4 w-4' />
         </Button>

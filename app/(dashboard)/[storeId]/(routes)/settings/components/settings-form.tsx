@@ -15,6 +15,8 @@ import { Input } from '@/components/ui/input'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import AlertModal from '@/components/modals/alert-modal'
 import { useStoreModal } from '@/hooks/useStoreModal'
+import { ApiAlert } from '@/components/ui/api-alert'
+import { useOrigin } from '@/hooks/use-origin'
 
 const formSchema = z.object({ name: z.string().nonempty() })
 type Settings = z.infer<typeof formSchema>
@@ -26,6 +28,7 @@ const SettingsForm: FC<Props> = ({ initData }) => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const origin = useOrigin()
   const { setHasStore } = useStoreModal.use('setHasStore')
   const form = useForm<Settings>({
     resolver: zodResolver(formSchema),
@@ -90,6 +93,8 @@ const SettingsForm: FC<Props> = ({ initData }) => {
           </Button>
         </form>
       </Form>
+      <Separator />
+      <ApiAlert title='NEXT_PUBLIC_API_URL' description={`${origin}/api/${params.storeId}`} variant='public' />
     </>
   )
 }

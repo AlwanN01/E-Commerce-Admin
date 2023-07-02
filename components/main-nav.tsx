@@ -15,6 +15,11 @@ const MainNav: FC<Props> = ({ className, ...props }) => {
   const params = useParams()
   const routes: Routes = [
     {
+      href: `/${params.storeId}`,
+      label: 'Overciew',
+      active: pathName === `/${params.storeId}`
+    },
+    {
       href: `/${params.storeId}/settings`,
       label: 'Settings',
       active: pathName === `/${params.storeId}/settings`

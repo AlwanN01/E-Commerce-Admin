@@ -18,7 +18,8 @@ const StoreModal: React.FC<Props> = ({}) => {
   const router = useRouter()
   const form = useForm<FormModal>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: '' }
+    defaultValues: { name: '' },
+    mode: 'onTouched'
   })
   return (
     <Modal

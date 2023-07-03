@@ -12,6 +12,7 @@ export const useStoreModal = createStore(
         set({ isLoading: true })
         const res = await axios.post('/api/stores', values)
         set({ isOpen: false, hasStore: true })
+        router.refresh()
         router.push(`/${res.data.id}`)
       } catch (error) {
         toast.error('Something went wrong')

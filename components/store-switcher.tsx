@@ -15,7 +15,6 @@ import {
   CommandList,
   CommandSeparator
 } from '@/components/ui/command'
-import StoreModal from './modals/store-modal'
 import { useStoreModal } from '@/hooks/useStoreModal'
 
 type PopoverTriggerProps = ComponentPropsWithoutRef<typeof PopoverTrigger>
@@ -37,6 +36,7 @@ const StoreSwitcher: FC<Props> = ({ className, items = [] }) => {
     setOpen(false)
     router.push(`/${store.value}`)
   }
+  const onStoreHover = (store: { value: string; label: string }) => router.prefetch(`/${store.value}`)
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -59,7 +59,11 @@ const StoreSwitcher: FC<Props> = ({ className, items = [] }) => {
             <CommandEmpty>No Store Found.</CommandEmpty>
             <CommandGroup heading='Stores'>
               {formattedItems.map(store => (
-                <CommandItem key={store.value} onSelect={() => onStoreSelect(store)}>
+                <CommandItem
+                  key={store.value}
+                  className='cursor-pointer'
+                  onSelect={() => onStoreSelect(store)}
+                  onMouseOver={() => onStoreHover(store)}>
                   <StoreIcon className='mr-2 h-4 w-4' />
                   {store.label}
                   <Check

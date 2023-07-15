@@ -51,11 +51,11 @@ const SettingsForm: FC<Props> = ({ initData }) => {
       setLoading(true)
       await axios.delete(`/api/stores/${params.storeId}`)
       setHasStore(false)
+      toast.success('Store deleted.')
       router.refresh()
       router.push('/')
     } catch (error) {
       toast.error('Make sure you removed all products and categgories first')
-      toast.success('Store deleted. ')
     } finally {
       setLoading(false)
       setOpen(false)

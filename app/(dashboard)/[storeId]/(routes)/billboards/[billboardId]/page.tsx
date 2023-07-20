@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prismadb'
 import { type FC } from 'react'
-import BillboardForm from '../components/billboard-form'
+import BillboardForm from './components/billboard-form'
 
 type Props = { params: { billboardId: string } }
 

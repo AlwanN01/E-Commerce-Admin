@@ -52,7 +52,7 @@ export function createStore<
                 set(nextStateOrUpdater, false, {
                   type:
                     key.length == 1
-                      ? `set${key[0].charAt(0).toUpperCase() + key[0].slice(1)} to ${values[0]}`
+                      ? `set${key[0]!.charAt(0).toUpperCase() + key[0]!.slice(1)} to ${values[0]}`
                       : typeof nextStateOrUpdater == 'function'
                       ? `set: ${extractString(nextStateOrUpdater.toString())}`
                       : `set: ${key.join(' | ')}`

@@ -1,4 +1,4 @@
-import type { BillboardForm } from '@/app/(dashboard)/[storeId]/(routes)/billboards/components/billboard-form'
+import type { BillboardForm } from '@/app/(dashboard)/[storeId]/(routes)/billboards/[billboardId]/components/billboard-form'
 import { prisma } from '@/lib/prismadb'
 import { auth } from '@clerk/nextjs'
 import { NextResponse } from 'next/server'

@@ -17,17 +17,17 @@ const MainNav: FC<Props> = ({ className, ...props }) => {
     {
       href: `/${params.storeId}`,
       label: 'Overciew',
-      active: pathName === `/${params.storeId}`
+      active: pathName.startsWith(`/${params.storeId}`)
     },
     {
       href: `/${params.storeId}/billboards`,
       label: 'Billboards',
-      active: pathName === `/${params.storeId}/billboards`
+      active: pathName.startsWith(`/${params.storeId}/billboards`)
     },
     {
       href: `/${params.storeId}/settings`,
       label: 'Settings',
-      active: pathName === `/${params.storeId}/settings`
+      active: pathName.startsWith(`/${params.storeId}/settings`)
     }
   ]
   return (

@@ -15,8 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import AlertModal from '@/components/modals/alert-modal'
 import { useStoreModal } from '@/hooks/useStoreModal'
-import { ApiAlert } from '@/components/ui/api-alert'
-import { useOrigin } from '@/hooks/use-origin'
+
 import { ImageUpload } from '@/components/ui/image-upload'
 
 const formSchema = z.object({ label: z.string().nonempty(), imageUrl: z.string().nonempty() })
@@ -29,7 +28,6 @@ const BillboardForm: FC<Props> = ({ initData }) => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const origin = useOrigin()
   const title = initData ? 'Edit Billboard' : 'Create Billboard'
   const description = initData ? 'Edit a Billboard' : 'Add a new Billboard'
   const toastMessage = initData ? 'Billboard updated.' : 'Billboard created'
@@ -48,6 +46,7 @@ const BillboardForm: FC<Props> = ({ initData }) => {
         await axios.post(`/api/${params.storeId}/billboards`, data)
       }
       router.refresh()
+      router.push(`/${params.storeId}/billboards`)
       toast.success(toastMessage)
     } catch (error) {
       toast.error('Something went wrong')
@@ -61,7 +60,7 @@ const BillboardForm: FC<Props> = ({ initData }) => {
       await axios.delete(`/api/${params.storeId}/billboards/${params.billboardId}`)
       setHasStore(false)
       router.refresh()
-      router.push('/')
+      router.push(`/${params.storeId}/billboards`)
       toast.success('Billboard deleted. ')
     } catch (error) {
       toast.error('Make sure you removed all categgories using this billboard first')
@@ -89,7 +88,7 @@ const BillboardForm: FC<Props> = ({ initData }) => {
             name='imageUrl'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Backgroun image</FormLabel>
+                <FormLabel>Background image</FormLabel>
                 <FormControl>
                   <ImageUpload
                     value={field.value ? [field.value] : []}
@@ -122,7 +121,6 @@ const BillboardForm: FC<Props> = ({ initData }) => {
           </Button>
         </form>
       </Form>
-      <Separator />
     </>
   )
 }
